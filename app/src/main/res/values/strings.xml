@@ -3,4 +3,6 @@
     <string name="save">SAVE</string>
     <string name="hint_name">Name:</string>
     <string name="hint_count">Count:</string>
+    <string name="error_input_count">Count input error</string>
+    <string name="error_input_name">Name input error</string>
 </resources>
