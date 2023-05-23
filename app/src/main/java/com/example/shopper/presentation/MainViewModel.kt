@@ -1,26 +1,19 @@
 package com.example.shopper.presentation
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shopper.data.ShopListRepositoryImpl
 import com.example.shopper.domain.DeleteShopItemUseCase
 import com.example.shopper.domain.EditShopItemUseCase
 import com.example.shopper.domain.GetShopListUseCase
 import com.example.shopper.domain.ShopItem
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainViewModel(application: Application) :
-    AndroidViewModel(application) { //Если нужно обращение по context, то наследоваться от AndroidViewModel
-    private val repository =
-        ShopListRepositoryImpl(application) //на данный момент реализация неверная, но
-    //мы пока не выучили имплементацию зависимостей
-    //в импорте есть зависимость от data слоя, что в корне не верно
-    //в дальнейшем исправлю
-
-    private val getShopListUseCase = GetShopListUseCase(repository)
-    private val deleteShopItemUseCase = DeleteShopItemUseCase(repository)
-    private val editShopItemUseCase = EditShopItemUseCase(repository)
+class MainViewModel @Inject constructor (
+    getShopListUseCase: GetShopListUseCase,
+    private val deleteShopItemUseCase: DeleteShopItemUseCase,
+    private val editShopItemUseCase: EditShopItemUseCase
+    ) : ViewModel() {
 
     val shopList = getShopListUseCase.getShopList()
 
