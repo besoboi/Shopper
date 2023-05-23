@@ -7,6 +7,6 @@ data class ShopItem(
     var id: Int = UNDEFINED_ID //var можно менять
 ) {
     companion object {
-        const val UNDEFINED_ID = -1 //const можно задать только в compiletime
+        const val UNDEFINED_ID = 0 //const можно задать только в compiletime
     }
 }

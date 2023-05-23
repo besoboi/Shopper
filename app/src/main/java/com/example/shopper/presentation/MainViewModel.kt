@@ -1,30 +1,34 @@
 package com.example.shopper.presentation
 
 import androidx.lifecycle.ViewModel
-import com.example.shopper.data.ShopListRepositoryImpl
+import androidx.lifecycle.viewModelScope
 import com.example.shopper.domain.DeleteShopItemUseCase
 import com.example.shopper.domain.EditShopItemUseCase
 import com.example.shopper.domain.GetShopListUseCase
 import com.example.shopper.domain.ShopItem
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainViewModel : ViewModel() { //Если нужно обращение по context, то наследоваться от AndroidViewModel
-    private val repository = ShopListRepositoryImpl //на данный момент реализация неверная, но
-    //мы пока не выучили имплементацию зависимостей
-    //в импорте есть зависимость от data слоя, что в корне не верно
-    //в дальнейшем исправлю
-
-    private val getShopListUseCase = GetShopListUseCase(repository)
-    private val deleteShopItemUseCase = DeleteShopItemUseCase(repository)
-    private val editShopItemUseCase = EditShopItemUseCase(repository)
+class MainViewModel @Inject constructor (
+    getShopListUseCase: GetShopListUseCase,
+    private val deleteShopItemUseCase: DeleteShopItemUseCase,
+    private val editShopItemUseCase: EditShopItemUseCase
+    ) : ViewModel() {
 
     val shopList = getShopListUseCase.getShopList()
 
-    fun deleteShopItem(shopItem: ShopItem){
-        deleteShopItemUseCase.deleteShopItem(shopItem)
+    fun deleteShopItem(shopItem: ShopItem) {
+        viewModelScope.launch {
+            deleteShopItemUseCase.deleteShopItem(shopItem)
+        }
+
     }
 
     fun changeEnableState(shopItem: ShopItem) {
-        val newItem = shopItem.copy(enabled = !shopItem.enabled)
-        editShopItemUseCase.editShopItem(newItem)
+        viewModelScope.launch {
+            val newItem = shopItem.copy(enabled = !shopItem.enabled)
+            editShopItemUseCase.editShopItem(newItem)
+        }
     }
+
 }
