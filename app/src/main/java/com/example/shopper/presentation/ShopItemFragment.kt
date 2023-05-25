@@ -1,6 +1,8 @@
 package com.example.shopper.presentation
 
+import android.content.ContentValues
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -12,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.shopper.databinding.FragmentShopItemBinding
 import com.example.shopper.domain.ShopItem
 import javax.inject.Inject
+import kotlin.concurrent.thread
 
 class ShopItemFragment() : Fragment() {
 
@@ -28,7 +31,7 @@ class ShopItemFragment() : Fragment() {
     private var screenMode: String = MODE_UNKNOWN
     private var shopItemId: Int = ShopItem.UNDEFINED_ID
 
-    private var _binding : FragmentShopItemBinding? = null
+    private var _binding: FragmentShopItemBinding? = null
     private val binding: FragmentShopItemBinding
         get() = _binding ?: throw RuntimeException("binding is null")
 
@@ -113,14 +116,39 @@ class ShopItemFragment() : Fragment() {
 
     private fun launchAddMode() {
         binding.btSave.setOnClickListener {
-            viewModel.addShopItem(binding.etName.text.toString(), binding.etCount.text.toString())
+//            viewModel.addShopItem(binding.etName.text.toString(), binding.etCount.text.toString())
+            thread {
+                context?.contentResolver?.insert(
+                    Uri.parse("content://com.example.shopper/shop_items"),
+                    ContentValues().apply {
+                        put("id", 0)
+                        put("name", binding.etName.text.toString())
+                        put("count", binding.etCount.text.toString().toInt())
+                        put("enabled", true)
+
+                    }
+                )
+            }
         }
     }
 
     private fun launchEditMode() {
         viewModel.getShopItem(shopItemId)
         binding.btSave.setOnClickListener {
-            viewModel.editShopItem(binding.etName.text.toString(), binding.etCount.text.toString())
+//            viewModel.editShopItem(binding.etName.text.toString(), binding.etCount.text.toString())
+            thread {
+                context?.contentResolver?.update(
+                    Uri.parse("content://com.example.shopper/shop_items"),
+                    ContentValues().apply {
+                        put("id", 0)
+                        put("name", binding.etName.text.toString())
+                        put("count", binding.etCount.text.toString().toInt())
+                        put("enabled", true)
+                    },
+                    null,
+                    arrayOf(shopItemId.toString())
+                )
+            }
         }
     }
 
@@ -143,7 +171,7 @@ class ShopItemFragment() : Fragment() {
         }
     }
 
-    interface OnEditingFinishedListener{
+    interface OnEditingFinishedListener {
         fun OnEditingFinished()
     }
 
@@ -154,7 +182,7 @@ class ShopItemFragment() : Fragment() {
         const val MODE_UNKNOWN = ""
         const val SHOP_ITEM_ID = "extra_shop_item_id"
 
-        fun newInstanceAddItem() : ShopItemFragment {
+        fun newInstanceAddItem(): ShopItemFragment {
             return ShopItemFragment().apply {
                 arguments = Bundle().apply {
                     putString(EXTRA_MODE, MODE_ADD)
@@ -163,7 +191,7 @@ class ShopItemFragment() : Fragment() {
 
         }
 
-        fun newInstanceEditItem(shopItemID: Int) : ShopItemFragment {
+        fun newInstanceEditItem(shopItemID: Int): ShopItemFragment {
             return ShopItemFragment().apply {
                 arguments = Bundle().apply {
                     putString(EXTRA_MODE, MODE_EDIT)

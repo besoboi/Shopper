@@ -1,6 +1,7 @@
 package com.example.shopper.di
 
 import android.app.Application
+import com.example.shopper.data.ShopListProvider
 import com.example.shopper.presentation.MainActivity
 import com.example.shopper.presentation.ShopItemFragment
 import com.example.shopper.presentation.ShopperApp
@@ -18,6 +19,8 @@ interface ApplicationComponent {
     fun inject(activity: MainActivity)
 
     fun inject(fragment: ShopItemFragment)
+
+    fun inject(provider: ShopListProvider)
 
     @Component.Factory
     interface Factory {
